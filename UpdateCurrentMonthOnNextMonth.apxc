@@ -1,0 +1,26 @@
+public class UpdateCurrentMonthOnNextMonth implements Schedulable {
+
+    public static void execute(SchedulableContext SC){
+
+        // gets the collection of last month's transactions.
+        List<Transaction__c> transList = [SELECT Id, CurrentMonth__c FROM Transaction__c WHERE TransactionDate__c = LAST_MONTH];
+
+        // creates a new list for updated transactions.
+        List<Transaction__c> newTransList = new List<Transaction__c>();
+
+        // changes the current month value to false and adds to the new collection list.
+        for(Transaction__c trans : transList){
+           if(trans.CurrentMonth__c == true){
+              trans.CurrentMonth__c = false;
+              newTransList.add(trans);
+           }
+        }
+        try{
+            // executes the dml update command.
+            update newTransList;
+        }
+        catch(DMLException e){
+            System.debug('An exception occurred: ' + e.getMessage());
+        }
+    }
+}
